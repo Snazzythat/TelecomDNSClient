@@ -1,5 +1,10 @@
 /**
- * Main Quesry Worker class
+ * Lab 2 Telecom ECSE 489
+ *
+ * @author Roman Andoni 260585085
+ * @author Armen Stepanians 260586139
+ *         <p>
+ *         Query Worker
  */
 public class QueryWorker {
 
