@@ -1,3 +1,5 @@
+import java.nio.ByteBuffer;
+
 /**
  * Lab 2 Telecom ECSE 489
  *
@@ -9,12 +11,17 @@
 public class DnsQueryRequest {
 
 	private byte[] requestHeader;
+	private byte[] requestQuestion;
+	private String domainName;
+	private String queryType;
 
 	/**
 	 * Constructor
 	 */
-	public DnsQueryRequest() {
+	public DnsQueryRequest(String domainName, String queryType) {
 
+		this.domainName = domainName;
+		this.queryType = queryType;
 	}
 
 	/**
@@ -29,15 +36,23 @@ public class DnsQueryRequest {
 	 * Gets the question byte array
 	 */
 	public void buildDnsRequestQuestion() {
-
+		DnsQuestion dnsQuestion = new DnsQuestion(domainName, queryType, (short) 0x0001);
+		requestQuestion = dnsQuestion.getDnsQuestion();
 	}
 
 	/**
 	 * Joins header and question for a request packet
 	 * And returns the packet data
 	 */
-	public void createRequestPacket() {
+	public byte[] createRequestPacket() {
 
+		buildDnsRequestHeader();
+		buildDnsRequestQuestion();
+
+		return ByteBuffer.allocate(requestHeader.length + requestQuestion.length)
+				.put(requestHeader, 0, requestHeader.length)
+				.put(requestQuestion, requestHeader.length - 1, requestQuestion.length)
+				.array();
 	}
 
 }

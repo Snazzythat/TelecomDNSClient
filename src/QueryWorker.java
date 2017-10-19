@@ -8,12 +8,14 @@
  */
 public class QueryWorker {
 
-	public String dnsServerIP;
-	public String domainName;
-	public int timeout;
-	public int retryCount;
-	public int port;
-	public String queryType;
+	private byte[] dnsRequest;
+
+	private String dnsServerIP;
+	private String domainName;
+	private int timeout;
+	private int retryCount;
+	private int port;
+	private String queryType;
 
 	/**
 	 * Constructor
@@ -38,6 +40,9 @@ public class QueryWorker {
 	 * Build the actual DNS query
 	 */
 	public void buildQuery() {
+		DnsQueryRequest dnsQueryRequest = new DnsQueryRequest(domainName, queryType);
+		dnsRequest = dnsQueryRequest.createRequestPacket();
 
+		System.out.println(69);
 	}
 }

@@ -14,15 +14,15 @@ public class DnsQuestion {
 	private byte[] QTYPE;
 	private byte[] QCLASS;
 
-	private final int A = 0x0001;
-	private final int NS = 0x0002;
-	private final int MX = 0x000f;
+	private final short A = 0x0001;
+	private final short NS = 0x0002;
+	private final short MX = 0x000f;
 
-	public DnsQuestion(String domainName, String queryType, int queryClass) {
+	public DnsQuestion(String domainName, String queryType, short queryClass) {
 
 		QNAME = constructQName(domainName);
 		QTYPE = getQueryType(queryType);
-		QCLASS = ByteBuffer.allocate(2).putInt((byte) queryClass).array();
+		QCLASS = ByteBuffer.allocate(2).putShort(queryClass).array();
 
 	}
 
@@ -42,7 +42,7 @@ public class DnsQuestion {
 
 	private byte[] constructQName(String domainName) {
 
-		String[] domainNameArray = domainName.split(".");
+		String[] domainNameArray = domainName.split("\\.");
 
 		// determine length of array so we can construct it
 		int queryArrayLength = domainNameArray.length + 1;
@@ -58,7 +58,7 @@ public class DnsQuestion {
 			destPos++;
 
 			System.arraycopy(label.getBytes(), 0, queryNameArray, destPos, label.length());
-			destPos += label.length() - 1;
+			destPos += label.length();
 		}
 
 		// for end put 0
@@ -69,20 +69,20 @@ public class DnsQuestion {
 
 	private byte[] getQueryType(String queryType) {
 
-		byte[] queryTypeArray = new byte[2];
+		ByteBuffer queryTypeArray = ByteBuffer.allocate(2);
 
 		switch (queryType) {
 			case "A":
-				queryTypeArray = ByteBuffer.allocate(2).putInt((byte) A).array();
+				queryTypeArray.putShort(A);
 				break;
 			case "NS":
-				queryTypeArray = ByteBuffer.allocate(2).putInt((byte) NS).array();
+				queryTypeArray.putShort(NS);
 				break;
 			case "MX":
-				queryTypeArray = ByteBuffer.allocate(2).putInt((byte) MX).array();
+				queryTypeArray.putShort(MX);
 				break;
 		}
 
-		return queryTypeArray;
+		return queryTypeArray.array();
 	}
 }

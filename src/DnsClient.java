@@ -13,7 +13,7 @@ public class DnsClient {
 	private int timeout;
 	private int retryCount;
 	private int port;
-	private String queryType;
+	private String queryType = "A";
 
 	public static void main(String[] args) {
 
@@ -73,7 +73,7 @@ public class DnsClient {
 							}
 							break;
 						case 'n':
-							queryType = "NX";
+							queryType = "NS";
 							i++;
 							break;
 						case 'm':
@@ -114,6 +114,7 @@ public class DnsClient {
 	 */
 	public void startQuery() {
 		QueryWorker worker = new QueryWorker(dnsServerIP, domainName, timeout, retryCount, port, queryType);
+		worker.buildQuery();
 	}
 
 
