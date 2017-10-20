@@ -35,7 +35,7 @@ public class DnsHeader {
 	}
 
 	/**
-	 * Random ID geenrator
+	 * Random ID generator
 	 *
 	 * @return 16-bit short for ID
 	 */

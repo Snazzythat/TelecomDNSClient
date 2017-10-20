@@ -29,12 +29,12 @@ public class QueryWorker {
 	/**
 	 * Constructor
 	 *
-	 * @param dnsIP
-	 * @param dName
-	 * @param to
-	 * @param rt
-	 * @param pt
-	 * @param qt
+	 * @param dnsIP DNS server IP
+	 * @param dName domain name
+	 * @param to    timeout
+	 * @param rt    number of retries
+	 * @param pt    port
+	 * @param qt    query type
 	 */
 	public QueryWorker(String dnsIP, String dName, int to, int rt, int pt, String qt) {
 		dnsServerIP = dnsIP;
@@ -76,6 +76,7 @@ public class QueryWorker {
 		long startTime = 0;
 		long endTime = 0;
 		boolean successfulQuery = false;
+
 		//Enter Main Loop
 		while (true) {
 			try {
@@ -83,8 +84,9 @@ public class QueryWorker {
 				udpSock.send(requestPacket);
 				//ASYNC WAIT ON ANSWER
 				udpSock.receive(answerPacket);
-				successfulQuery = true;
+				endTime = System.currentTimeMillis();
 
+				successfulQuery = true;
 				System.out.println("\n");
 				System.out.println("Successful query.");
 
@@ -108,10 +110,9 @@ public class QueryWorker {
 			}
 
 			if (successfulQuery) {
-				endTime = System.currentTimeMillis();
 
 				long difference = endTime - startTime;
-				System.out.println("Response received after " +  difference + " ms.");
+				System.out.println("Response received after " + difference + " ms.");
 
 				//TODO: parse response
 				//TODO: print stuff as specified
@@ -124,7 +125,7 @@ public class QueryWorker {
 	 * Util to build an InetAddress used for Datagram socket
 	 * LEGAL UTILIZATION OF getByAddress is ALLOWED
 	 *
-	 * @return
+	 * @return InetAddress object of the specified IP
 	 */
 	public InetAddress convertIpAddress() throws UnknownHostException {
 		String[] splitIP = this.dnsServerIP.split("\\.");
