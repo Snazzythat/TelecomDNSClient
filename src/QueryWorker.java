@@ -9,7 +9,6 @@
 
 import java.net.InetAddress;
 import java.net.UnknownHostException;
-import java.nio.ByteBuffer;
 import java.net.DatagramSocket;
 import java.net.DatagramPacket;
 import java.net.SocketTimeoutException;
@@ -61,7 +60,7 @@ public class QueryWorker {
 	 */
 	public void sendDnsQuery() throws Exception {
 		// Address to use with the Datagram socket.
-		InetAddress dnsIpAddress = convertIpAdress();
+		InetAddress dnsIpAddress = convertIpAddress();
 
 		DatagramSocket udpSock = new DatagramSocket();
 
@@ -123,12 +122,12 @@ public class QueryWorker {
 	 *
 	 * @return
 	 */
-	public InetAddress convertIpAdress() throws UnknownHostException {
+	public InetAddress convertIpAddress() throws UnknownHostException {
 		String[] splitIP = this.dnsServerIP.split("\\.");
 
 		byte[] ipByt = new byte[4];
 
-		for (int i=0; i< splitIP.length; i++) {
+		for (int i = 0; i < splitIP.length; i++) {
 			ipByt[i] = (byte) (int) Integer.valueOf(splitIP[i]);
 		}
 		return InetAddress.getByAddress(ipByt);

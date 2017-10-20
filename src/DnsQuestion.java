@@ -23,21 +23,15 @@ public class DnsQuestion {
 		QNAME = constructQName(domainName);
 		QTYPE = getQueryType(queryType);
 		QCLASS = ByteBuffer.allocate(2).putShort(queryClass).array();
-
 	}
 
 	public byte[] getDnsQuestion() {
 
-		byte[] dnsQuestion = new byte[QNAME.length + QTYPE.length + QCLASS.length];
-
-		int destPos = 0;
-
-		for (byte[] byteArray : new byte[][]{QNAME, QTYPE, QCLASS}) {
-			System.arraycopy(byteArray, 0, dnsQuestion, destPos, byteArray.length);
-			destPos += byteArray.length - 1;
-		}
-
-		return dnsQuestion;
+		return ByteBuffer.allocate(QNAME.length + QTYPE.length + QCLASS.length)
+				.put(QNAME)
+				.put(QTYPE)
+				.put(QCLASS)
+				.array();
 	}
 
 	private byte[] constructQName(String domainName) {

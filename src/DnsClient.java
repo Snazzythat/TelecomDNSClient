@@ -29,7 +29,7 @@ public class DnsClient {
 
 			clientIntsance.startQuery();
 		} else {
-			System.out.println("No arhuments were passed. See usage:\n");
+			System.out.println("No arguments were passed. See usage:\n");
 			System.out.println("@server | (req) - IPv4 address of the DNSserver");
 			System.out.println("name | (req) - Domain name to query.");
 			System.out.println("-t timeout | (opt) - Timeout before query retransmission");
@@ -116,7 +116,7 @@ public class DnsClient {
 		try {
 			worker.sendDnsQuery();
 		} catch (Exception e) {
-			System.out.println("Exception occurred while sending the DNS Query!");
+			System.out.println(e.getMessage());
 			e.printStackTrace();
 		}
 	}
