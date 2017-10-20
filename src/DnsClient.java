@@ -28,6 +28,7 @@ public class DnsClient {
 			}
 
 			clientIntsance.startQuery();
+
 		} else {
 			System.out.println("No arguments were passed. See usage:\n");
 			System.out.println("@server | (req) - IPv4 address of the DNSserver");
@@ -110,10 +111,18 @@ public class DnsClient {
 	 * Start the Query Worker to build the DNS query and send it to the server
 	 */
 	public void startQuery() {
+
+		System.out.println("\n\n");
+		System.out.println("DnsClient sending request for " + domainName);
+		System.out.println("Server: " + dnsServerIP);
+		System.out.println("Port: " +  port);
+		System.out.println("Request type: " + queryType);
+
 		QueryWorker worker = new QueryWorker(dnsServerIP, domainName, timeout, retryCount, port, queryType);
 		worker.buildQuery();
 
 		try {
+			System.out.println("Sending the DNS query...");
 			worker.sendDnsQuery();
 		} catch (Exception e) {
 			System.out.println(e.getMessage());

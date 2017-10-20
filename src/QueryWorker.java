@@ -51,8 +51,6 @@ public class QueryWorker {
 	public void buildQuery() {
 		DnsQueryRequest dnsQueryRequest = new DnsQueryRequest(domainName, queryType);
 		dnsRequest = dnsQueryRequest.createRequestPacket();
-
-		System.out.println(69);
 	}
 
 	/**
@@ -87,6 +85,9 @@ public class QueryWorker {
 				udpSock.receive(answerPacket);
 				successfulQuery = true;
 
+				System.out.println("\n");
+				System.out.println("Successful query.");
+
 			} catch (SocketTimeoutException e) {
 
 				//If receive on socket timed out, fallback mechanism is used below
@@ -108,6 +109,9 @@ public class QueryWorker {
 
 			if (successfulQuery) {
 				endTime = System.currentTimeMillis();
+
+				long difference = endTime - startTime;
+				System.out.println("Response received after " +  difference + " ms.");
 
 				//TODO: parse response
 				//TODO: print stuff as specified
