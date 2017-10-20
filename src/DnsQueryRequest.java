@@ -50,8 +50,8 @@ public class DnsQueryRequest {
 		buildDnsRequestQuestion();
 
 		return ByteBuffer.allocate(requestHeader.length + requestQuestion.length)
-				.put(requestHeader, 0, requestHeader.length)
-				.put(requestQuestion, requestHeader.length - 1, requestQuestion.length)
+				.put(requestHeader)
+				.put(requestQuestion)
 				.array();
 	}
 

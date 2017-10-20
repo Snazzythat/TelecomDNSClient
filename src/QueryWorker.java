@@ -125,13 +125,12 @@ public class QueryWorker {
 	 */
 	public InetAddress convertIpAdress() throws UnknownHostException {
 		String[] splitIP = this.dnsServerIP.split("\\.");
-		ByteBuffer ipBytes = ByteBuffer.allocate(8); // 4 ints 2 bytes each
 
-		for (String aSplitIP : splitIP) {
-			ipBytes.putInt(Integer.valueOf(aSplitIP));
+		byte[] ipByt = new byte[4];
+
+		for (int i=0; i< splitIP.length; i++) {
+			ipByt[i] = (byte) (int) Integer.valueOf(splitIP[i]);
 		}
-		byte[] byteIP = ipBytes.array();
-
-		return InetAddress.getByAddress(byteIP);
+		return InetAddress.getByAddress(ipByt);
 	}
 }

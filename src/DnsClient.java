@@ -22,7 +22,7 @@ public class DnsClient {
 		}
 		DnsClient clientIntsance = new DnsClient();
 
-		if (args.length > 2) {
+		if (args.length >= 2) {
 			try {
 				clientIntsance.parseArguments(args);
 			} catch (Exception e) {
