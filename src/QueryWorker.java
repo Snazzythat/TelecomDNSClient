@@ -3,8 +3,8 @@
  *
  * @author Roman Andoni 260585085
  * @author Armen Stepanians 260586139
- *         <p>
- *         Query Worker
+ * <p>
+ * Query Worker
  */
 
 import java.net.InetAddress;
@@ -57,15 +57,15 @@ public class QueryWorker {
 	/**
 	 * Sending the DNS query via sockets
 	 */
-	public void sendDNSQuery() throws Exception {
-		// Address to use with the Datgram socket.
+	public void sendDnsQuery() throws Exception {
+		// Address to use with the Datagram socket.
 		InetAddress dnsIpAddress = convertIpAdress();
 
-		DatagramSocket updSock = new DatagramSocket();
+		DatagramSocket udpSock = new DatagramSocket();
 
 		//Setting timeout, if any specified.
-		if(this.timeout!= 0){
-			updSock.setSoTimeout(this.timeout);
+		if (this.timeout != 0) {
+			udpSock.setSoTimeout(this.timeout);
 		}
 
 		int retryCounter = 1;
@@ -75,35 +75,35 @@ public class QueryWorker {
 
 		long startTime = 0;
 		long endTime = 0;
-		boolean successfullQuery = false;
+		boolean successfulQuery = false;
 		//Enter Main Loop
-		while(true)
-		{
+		while (true) {
 			try {
 				startTime = System.currentTimeMillis();
-				updSock.send(requestPacket);
+				udpSock.send(requestPacket);
 				//ASYNC
 				//updSock.receive(answerPacket);
-				successfullQuery = true;
+				successfulQuery = true;
 
-			}catch(SocketTimeoutException e ){
+			} catch (SocketTimeoutException e) {
 
-				if(retryCount > 0) {
-					System.out.println("Timeout occured. Retrying. Attempt " + Integer.toString(retryCounter) + " out of " +
-							Integer.toString(this.retryCount));
+				if (retryCount > 0) {
+					System.out.println("Timeout occurred. Retrying. Attempt "
+							+ Integer.toString(retryCounter)
+							+ " out of "
+							+ Integer.toString(this.retryCount));
 					if (retryCounter == this.retryCount) {
 						System.out.println("Maximum amount of retries reached. Exiting...");
 						break;
 					}
 					retryCounter += 1;
-				}else{
+				} else {
 					System.out.println("Request timed out. Exiting...");
 					break;
 				}
 			}
 
-			if (successfullQuery == true)
-			{
+			if (successfulQuery) {
 				endTime = System.currentTimeMillis();
 
 				//TODO: parse response
@@ -116,16 +116,17 @@ public class QueryWorker {
 	/**
 	 * Util to build an InetAddress used for Datagram socket
 	 * LEGAL UTILIZATION OF getByAddress is ALLOWED
+	 *
 	 * @return
 	 */
-	public InetAddress convertIpAdress() throws UnknownHostException{
+	public InetAddress convertIpAdress() throws UnknownHostException {
 		String[] splitIP = this.dnsServerIP.split("\\.");
 		ByteBuffer ipBytes = ByteBuffer.allocate(8); // 4 ints 2 bytes each
 
-		for(int i = 0; i<splitIP.length; i++){
-			ipBytes.putInt(Integer.valueOf(splitIP[i]));
+		for (String aSplitIP : splitIP) {
+			ipBytes.putInt(Integer.valueOf(aSplitIP));
 		}
-		byte [] byteIP = ipBytes.array();
+		byte[] byteIP = ipBytes.array();
 
 		return InetAddress.getByAddress(byteIP);
 	}
