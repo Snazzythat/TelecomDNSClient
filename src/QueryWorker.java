@@ -6,6 +6,14 @@
  *         <p>
  *         Query Worker
  */
+
+import java.net.InetAddress;
+import java.net.UnknownHostException;
+import java.nio.ByteBuffer;
+import java.net.DatagramSocket;
+import java.net.DatagramPacket;
+import java.net.SocketTimeoutException;
+
 public class QueryWorker {
 
 	private byte[] dnsRequest;
@@ -44,5 +52,81 @@ public class QueryWorker {
 		dnsRequest = dnsQueryRequest.createRequestPacket();
 
 		System.out.println(69);
+	}
+
+	/**
+	 * Sending the DNS query via sockets
+	 */
+	public void sendDNSQuery() throws Exception {
+		// Address to use with the Datgram socket.
+		InetAddress dnsIpAddress = convertIpAdress();
+
+		DatagramSocket updSock = new DatagramSocket();
+
+		//Setting timeout, if any specified.
+		if(this.timeout!= 0){
+			updSock.setSoTimeout(this.timeout);
+		}
+
+		int retryCounter = 1;
+
+		DatagramPacket requestPacket = new DatagramPacket(dnsRequest, dnsRequest.length, dnsIpAddress, this.port);
+		//DatagramPacket answerPacket = ....
+
+		long startTime = 0;
+		long endTime = 0;
+		boolean successfullQuery = false;
+		//Enter Main Loop
+		while(true)
+		{
+			try {
+				startTime = System.currentTimeMillis();
+				updSock.send(requestPacket);
+				//ASYNC
+				//updSock.receive(answerPacket);
+				successfullQuery = true;
+
+			}catch(SocketTimeoutException e ){
+
+				if(retryCount > 0) {
+					System.out.println("Timeout occured. Retrying. Attempt " + Integer.toString(retryCounter) + " out of " +
+							Integer.toString(this.retryCount));
+					if (retryCounter == this.retryCount) {
+						System.out.println("Maximum amount of retries reached. Exiting...");
+						break;
+					}
+					retryCounter += 1;
+				}else{
+					System.out.println("Request timed out. Exiting...");
+					break;
+				}
+			}
+
+			if (successfullQuery == true)
+			{
+				endTime = System.currentTimeMillis();
+
+				//TODO: parse response
+				//TODO: print stuff as specified
+				break;
+			}
+		}
+	}
+
+	/**
+	 * Util to build an InetAddress used for Datagram socket
+	 * LEGAL UTILIZATION OF getByAddress is ALLOWED
+	 * @return
+	 */
+	public InetAddress convertIpAdress() throws UnknownHostException{
+		String[] splitIP = this.dnsServerIP.split("\\.");
+		ByteBuffer ipBytes = ByteBuffer.allocate(8); // 4 ints 2 bytes each
+
+		for(int i = 0; i<splitIP.length; i++){
+			ipBytes.putInt(Integer.valueOf(splitIP[i]));
+		}
+		byte [] byteIP = ipBytes.array();
+
+		return InetAddress.getByAddress(byteIP);
 	}
 }

@@ -10,9 +10,9 @@ public class DnsClient {
 
 	private String dnsServerIP;
 	private String domainName;
-	private int timeout;
-	private int retryCount;
-	private int port;
+	private int timeout = 0;
+	private int retryCount = 0;
+	private int port = 53;
 	private String queryType = "A";
 
 	public static void main(String[] args) {
@@ -22,7 +22,7 @@ public class DnsClient {
 		}
 		DnsClient clientIntsance = new DnsClient();
 
-		if (args.length > 0) {
+		if (args.length > 2) {
 			try {
 				clientIntsance.parseArguments(args);
 			} catch (Exception e) {
