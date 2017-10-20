@@ -18,6 +18,8 @@ public class QueryWorker {
 
 	private byte[] dnsRequest;
 
+	private byte[] dnsAnswer = new byte[1024];
+
 	private String dnsServerIP;
 	private String domainName;
 	private int timeout;
@@ -71,7 +73,8 @@ public class QueryWorker {
 		int retryCounter = 1;
 
 		DatagramPacket requestPacket = new DatagramPacket(dnsRequest, dnsRequest.length, dnsIpAddress, this.port);
-		//DatagramPacket answerPacket = ....
+
+		DatagramPacket answerPacket = new DatagramPacket(dnsAnswer, dnsAnswer.length);
 
 		long startTime = 0;
 		long endTime = 0;
@@ -81,12 +84,13 @@ public class QueryWorker {
 			try {
 				startTime = System.currentTimeMillis();
 				udpSock.send(requestPacket);
-				//ASYNC
-				//updSock.receive(answerPacket);
+				//ASYNC WAIT ON ANSWER
+				udpSock.receive(answerPacket);
 				successfulQuery = true;
 
 			} catch (SocketTimeoutException e) {
 
+				//If receive on socket timed out, fallback mechanism is used below
 				if (retryCount > 0) {
 					System.out.println("Timeout occurred. Retrying. Attempt "
 							+ Integer.toString(retryCounter)

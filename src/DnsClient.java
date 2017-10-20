@@ -115,6 +115,13 @@ public class DnsClient {
 	public void startQuery() {
 		QueryWorker worker = new QueryWorker(dnsServerIP, domainName, timeout, retryCount, port, queryType);
 		worker.buildQuery();
+
+		try {
+			worker.sendDnsQuery();
+		} catch (Exception e) {
+			System.out.println("Exception occurred while sending the DNS Query!");
+			e.printStackTrace();
+		}
 	}
 
 
