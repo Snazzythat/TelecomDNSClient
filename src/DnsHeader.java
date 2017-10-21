@@ -51,7 +51,7 @@ public class DnsHeader {
 	 *
 	 * @return
 	 */
-	public byte[] getDNSHeader() {
+	public byte[] getDnsHeader() {
 		//16bit/2byte * 6 entries -> 12 bytes per header
 		ByteBuffer headerData = ByteBuffer.allocate(12);
 		headerData.putShort(this.id);

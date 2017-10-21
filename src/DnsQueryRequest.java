@@ -29,7 +29,7 @@ public class DnsQueryRequest {
 	 */
 	public void buildDnsRequestHeader() {
 		DnsHeader dnsHeader = new DnsHeader();
-		requestHeader = dnsHeader.getDNSHeader();
+		requestHeader = dnsHeader.getDnsHeader();
 	}
 
 	/**
