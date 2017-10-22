@@ -33,7 +33,8 @@ public class DnsQueryAnswer {
 	public void queryAnswer() {
 
 		// TODO: loop the following based on ANCOUNT
-
+		queryIfNameServerAuthoritative(2);
+		queryIfMessageWasTruncated(2);
 		queryAnswerValidity();
 		queryAnswerQuestionFields();
 		queryAnswerName();
@@ -184,13 +185,17 @@ public class DnsQueryAnswer {
 	/**
 	 * Checks the AA field in Answers packet Question fields.
 	 * If set to 1, name server is authoritative
-	 *
+	 * Field is located in 3rd byte of Question
 	 * @param offset
 	 * @return
 	 */
 	public boolean queryIfNameServerAuthoritative(int offset) {
-		boolean authoritative = false;
-		return authoritative;
+		boolean isAuthoritative = false;
+
+		if(((dnsQueryAnswer[offset] >> 2) & 1) == 1){
+			isAuthoritative = true;
+		}
+		return isAuthoritative;
 	}
 
 	/**
@@ -202,6 +207,10 @@ public class DnsQueryAnswer {
 	 */
 	public boolean queryIfMessageWasTruncated(int offset) {
 		boolean truncated = false;
+
+		if(((dnsQueryAnswer[offset] >> 1) & 1) == 1){
+			truncated = true;
+		}
 		return truncated;
 	}
 
@@ -215,6 +224,10 @@ public class DnsQueryAnswer {
 	 */
 	public boolean queryIfServerSupportsRecursion(int offset) {
 		boolean recursionSupported = false;
+
+		if(((dnsQueryAnswer[offset] >> 7) & 1) == 1){
+			recursionSupported = true;
+		}
 		return recursionSupported;
 	}
 
