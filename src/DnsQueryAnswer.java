@@ -151,7 +151,7 @@ public class DnsQueryAnswer {
 	 */
 	public int queryMailServerPreference(int offset){
 
-		return dnsQueryAnswer[offset];
+		return dnsQueryAnswer[offset + 1];
 	}
 
 	/**
