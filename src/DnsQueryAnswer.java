@@ -54,15 +54,26 @@ public class DnsQueryAnswer {
 		return (dnsQueryAnswer[offset] & 0xC0) == 0xC0;
 	}
 
-	public String queryName(int offset) {
+	/**
+	 * Begin name with "", then if an index is encountered during name parse,
+	 * pass the already built name recursively
+	 * @param offset
+	 * @param qname
+	 * @return
+	 */
+	public String queryName(int offset, String qname) {
 
-		String name = "";
+		String name = qname;
 		int index = offset;
 
 		while (dnsQueryAnswer[index] != 0) {
 
-			if (!name.equals("")) {
+			if (!name.equals("") && name.charAt(name.length() - 1) != '.') {
 				name += ".";
+			}
+
+			if (isCompression(index)){
+				queryName(dnsQueryAnswer[index + 1],name);
 			}
 
 			int length = dnsQueryAnswer[index];
