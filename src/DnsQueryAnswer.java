@@ -3,6 +3,7 @@ import java.nio.ByteBuffer;
 
 public class DnsQueryAnswer {
 
+	private byte[] dnsQueryQuestion;
 	private byte[] dnsQueryAnswer;
 	private int dnsQueryQuestionLength;
 	private int dnsAnswerPointer;
@@ -15,16 +16,24 @@ public class DnsQueryAnswer {
 	private int dnsMailServerPreference;
 	private String dnsMailServerExchange;
 
-	public DnsQueryAnswer(byte[] dnsQueryAnswer, int dnsQueryQuestionLength) {
+	/**
+	 * Constructor
+	 *
+	 * @param dnsQueryQuestion Question bytes to be compared against answer for validity
+	 * @param dnsQueryAnswer   Answer bytes to be parsed
+	 */
+	public DnsQueryAnswer(byte[] dnsQueryQuestion, byte[] dnsQueryAnswer) {
 
+		this.dnsQueryQuestion = dnsQueryQuestion;
 		this.dnsQueryAnswer = dnsQueryAnswer;
-		this.dnsQueryQuestionLength = dnsQueryQuestionLength;
+		this.dnsQueryQuestionLength = dnsQueryQuestion.length;
 	}
 
 	public void queryAnswer() {
 
 		// TODO: loop the following based on ANCOUNT
 
+		queryAnswerValidity();
 		queryAnswerName();
 		queryAnswerType();
 		queryAnswerClass();
@@ -71,27 +80,6 @@ public class DnsQueryAnswer {
 				dnsMailServerExchange = queryMailServerExchange(dnsAnswerPointer);
 				break;
 		}
-	}
-
-	/**
-	 * Verifies if the label is a pointer (compression purposes)
-	 *
-	 * @param offset
-	 * @return
-	 */
-	public boolean isCompression(int offset) {
-		return (dnsQueryAnswer[offset] & 0xC0) == 0xC0;
-	}
-
-	/**
-	 * Merges two bytes into an integer
-	 *
-	 * @param b1
-	 * @param b2
-	 * @return
-	 */
-	public int getInt(byte b1, byte b2) {
-		return b1 << 8 & 0xFF00 | b2 & 0xFF;
 	}
 
 	/**
@@ -187,5 +175,38 @@ public class DnsQueryAnswer {
 		return queryName(offset, "");
 	}
 
+	/**
+	 * Verifies if the label is a pointer (compression purposes)
+	 *
+	 * @param offset
+	 * @return
+	 */
+	public boolean isCompression(int offset) {
+		return (dnsQueryAnswer[offset] & 0xC0) == 0xC0;
+	}
 
+	/**
+	 * Merges two bytes into an integer
+	 *
+	 * @param b1
+	 * @param b2
+	 * @return
+	 */
+	public int getInt(byte b1, byte b2) {
+		return b1 << 8 & 0xFF00 | b2 & 0xFF;
+	}
+
+	/**
+	 * Verifies if the answer data is actual valid by comparing
+	 * question and answer IDs
+	 */
+	public void queryAnswerValidity() {
+		int dnsQuestionID = getInt(dnsQueryQuestion[0], dnsQueryQuestion[1]);
+		int dnsAnswerID = getInt(dnsQueryAnswer[0], dnsQueryAnswer[1]);
+
+		if (dnsQuestionID != dnsAnswerID) {
+			System.out.println("Error \t Invalid DNS answer packet received: request and answer IDs don't match.");
+			System.exit(69);
+		}
+	}
 }

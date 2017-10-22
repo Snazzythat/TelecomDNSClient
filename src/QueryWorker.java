@@ -114,7 +114,7 @@ public class QueryWorker {
 				long difference = endTime - startTime;
 				System.out.println("Response received after " + difference + " ms.");
 				System.out.println("Parsing the DNS response packet...");
-				DnsQueryAnswer answer = new DnsQueryAnswer(answerPacket.getData(), dnsRequest.length);
+				DnsQueryAnswer answer = new DnsQueryAnswer(requestPacket.getData(), answerPacket.getData());
 				//Will loop over the answer byte array, parse out the necessary fields and print to stdout
 				answer.queryAnswer();
 				break;
