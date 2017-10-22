@@ -33,8 +33,6 @@ public class DnsQueryAnswer {
 	public void queryAnswer() {
 
 		// TODO: loop the following based on ANCOUNT
-		queryIfNameServerAuthoritative(2);
-		queryIfMessageWasTruncated(2);
 		queryAnswerValidity();
 		queryAnswerQuestionFields();
 		queryAnswerName();
@@ -237,8 +235,8 @@ public class DnsQueryAnswer {
 	 *
 	 * @param offset
 	 */
-	public void queryIfErrorsExist(int offset) {
-
+	public int queryErrorCode(int offset) {
+		return dnsQueryAnswer[offset] & 0x0F;
 	}
 
 	/**
