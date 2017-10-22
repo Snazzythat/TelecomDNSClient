@@ -5,12 +5,14 @@ public class DnsQueryAnswer {
 
 	private byte[] dnsQueryQuestion;
 	private byte[] dnsQueryAnswer;
-	private int dnsQueryQuestionLength;
 	private int dnsAnswerPointer;
-	private int dnsRdLength;
+	private short dnsRdLength;
 
 	// Actual data extracted from the answer, to be sent to stdout
 	private short dnsAnswerType;
+	private short dnsAnswerClass;
+	private int dnsAnswerTtl;
+	private String dnsAnswerName;
 	private String dnsAnswerIP;
 	private String dnsAnswerNameServer;
 	private String dnsAnswerCanonicalName;
@@ -27,7 +29,7 @@ public class DnsQueryAnswer {
 
 		this.dnsQueryQuestion = dnsQueryQuestion;
 		this.dnsQueryAnswer = dnsQueryAnswer;
-		this.dnsQueryQuestionLength = dnsQueryQuestion.length;
+		this.dnsAnswerPointer = dnsQueryQuestion.length;
 	}
 
 	public void queryAnswer() {
@@ -35,12 +37,15 @@ public class DnsQueryAnswer {
 		// TODO: loop the following based on ANCOUNT
 		queryAnswerValidity();
 		queryAnswerQuestionFields();
-		queryAnswerName();
-		queryAnswerType();
-		queryAnswerClass();
-		queryTtl();
-		queryRdLength();
-		queryRData();
+
+		for (int anCount = queryAnswerSectionRecordsCount(6); anCount > 0; anCount--) {
+			queryAnswerName();
+			queryAnswerType();
+			queryAnswerClass();
+			queryTtl();
+			queryRdLength();
+			queryRData();
+		}
 
 	}
 
@@ -50,22 +55,50 @@ public class DnsQueryAnswer {
 
 	public void queryAnswerName() {
 
+		queryName(dnsAnswerPointer, dnsAnswerName);
+
+		while (dnsQueryAnswer[dnsAnswerPointer] != 0) {
+
+			if (isCompression(dnsQueryAnswer[dnsAnswerPointer])) {
+				dnsAnswerPointer += 2;
+				break;
+			}
+			dnsAnswerPointer += dnsQueryAnswer[dnsAnswerPointer] + 1;
+		}
 	}
 
 	public void queryAnswerType() {
 
+		dnsAnswerType = (short) ((dnsQueryAnswer[dnsAnswerPointer] & 0xFF) << 8
+				| dnsQueryAnswer[dnsAnswerPointer + 1] & 0xFF);
+
+		dnsAnswerPointer += 2;
 	}
 
 	public void queryAnswerClass() {
 
+		dnsAnswerClass = (short) ((dnsQueryAnswer[dnsAnswerPointer] & 0xFF) << 8
+				| dnsQueryAnswer[dnsAnswerPointer + 1] & 0xFF);
+
+		dnsAnswerPointer += 2;
 	}
 
 	public void queryTtl() {
 
+		dnsAnswerTtl = ((dnsQueryAnswer[dnsAnswerPointer] & 0xFF) << 24)
+				| (dnsQueryAnswer[dnsAnswerPointer + 1] & 0xFF) << 16
+				| ((dnsQueryAnswer[dnsAnswerPointer + 2] & 0xFF) << 8)
+				| dnsQueryAnswer[dnsAnswerPointer + 3] & 0xFF;
+
+		dnsAnswerPointer += 4;
 	}
 
 	public void queryRdLength() {
 
+		dnsRdLength = (short) ((dnsQueryAnswer[dnsAnswerPointer] & 0xFF) << 8
+				| dnsQueryAnswer[dnsAnswerPointer + 1] & 0xFF);
+
+		dnsAnswerPointer += 2;
 	}
 
 	public void queryRData() {
@@ -85,15 +118,17 @@ public class DnsQueryAnswer {
 				dnsMailServerExchange = queryMailServerExchange(dnsAnswerPointer);
 				break;
 		}
+
+		dnsAnswerPointer += dnsRdLength + 1;
 	}
 
 	/**
 	 * Begin name with "", then if an index is encountered during name parse,
 	 * pass the already built name recursively
 	 *
-	 * @param offset
-	 * @param qName
-	 * @return
+	 * @param offset offset in the answer array
+	 * @param qName  query name parsed so far
+	 * @return completed query name
 	 */
 	public String queryName(int offset, String qName) {
 
@@ -125,9 +160,9 @@ public class DnsQueryAnswer {
 	}
 
 	/**
-	 * @param offset
-	 * @param RdLength
-	 * @return
+	 * @param offset   offset in the answer array
+	 * @param RdLength length of the RData section
+	 * @return IP address
 	 */
 	public String queryIpAddress(int offset, int RdLength) {
 
@@ -147,24 +182,24 @@ public class DnsQueryAnswer {
 	}
 
 	/**
-	 * @param offset
-	 * @return
+	 * @param offset offset in the answer array
+	 * @return name of the server
 	 */
 	public String queryNameServer(int offset) {
 		return queryName(offset, "");
 	}
 
 	/**
-	 * @param offset
-	 * @return
+	 * @param offset offset in the answer array
+	 * @return server canonical name
 	 */
 	public String queryCanonicalName(int offset) {
 		return queryName(offset, "");
 	}
 
 	/**
-	 * @param offset
-	 * @return
+	 * @param offset offset in the answer array
+	 * @return mail server preference
 	 */
 	public int queryMailServerPreference(int offset) {
 
@@ -172,8 +207,8 @@ public class DnsQueryAnswer {
 	}
 
 	/**
-	 * @param offset
-	 * @return
+	 * @param offset offset in the answer array
+	 * @return mail server exchange
 	 */
 	public String queryMailServerExchange(int offset) {
 
@@ -185,8 +220,8 @@ public class DnsQueryAnswer {
 	 * If set to 1, name server is authoritative
 	 * Field is located in 3rd byte of Question
 	 *
-	 * @param offset
-	 * @return
+	 * @param offset offset in the answer array
+	 * @return determines if name server is authoritative or not
 	 */
 	public boolean queryIfNameServerAuthoritative(int offset) {
 		boolean isAuthoritative = false;
@@ -201,8 +236,8 @@ public class DnsQueryAnswer {
 	 * Checks the TC field in Answers packet Question fields.
 	 * If set to 1, message was truncated
 	 *
-	 * @param offset
-	 * @return
+	 * @param offset offset in the answer array
+	 * @return determines if answer is truncated or not
 	 */
 	public boolean queryIfMessageWasTruncated(int offset) {
 		boolean truncated = false;
@@ -218,8 +253,8 @@ public class DnsQueryAnswer {
 	 * If set to 1, server supports recursion.
 	 * If 0, need to indicate error.
 	 *
-	 * @param offset
-	 * @return
+	 * @param offset offset in the answer array
+	 * @return determines if server supports recursion or not
 	 */
 	public boolean queryIfServerSupportsRecursion(int offset) {
 		boolean recursionSupported = false;
@@ -234,7 +269,7 @@ public class DnsQueryAnswer {
 	 * Checks RCODE field in Answers packet Question fields
 	 * If field is 0, no error, else any of 5 specified error types must be handled
 	 *
-	 * @param offset
+	 * @param offset offset in the answer array
 	 */
 	public int queryErrorCode(int offset) {
 		return dnsQueryAnswer[offset] & 0x0F;
@@ -244,8 +279,8 @@ public class DnsQueryAnswer {
 	 * Checks ANCOUNT field in Answers packet Question fields
 	 * Indicates the number of resource records found in answer section
 	 *
-	 * @param offset
-	 * @return
+	 * @param offset offset in the answer array
+	 * @return returns the ANCOUNT field
 	 */
 	public int queryAnswerSectionRecordsCount(int offset) {
 		return getInt(dnsQueryAnswer[offset], dnsQueryAnswer[offset + 1]);
@@ -255,8 +290,8 @@ public class DnsQueryAnswer {
 	 * Checks ARCOUNT field in Answers packet Question fields
 	 * Indicates the number of resource records found in additional section
 	 *
-	 * @param offset
-	 * @return
+	 * @param offset offset in the answer array
+	 * @return returns the ARCOUNT field
 	 */
 	public int queryAdditionalSectionRecordsCount(int offset) {
 		return getInt(dnsQueryAnswer[offset], dnsQueryAnswer[offset + 1]);
@@ -265,8 +300,8 @@ public class DnsQueryAnswer {
 	/**
 	 * Verifies if the label is a pointer (compression purposes)
 	 *
-	 * @param offset
-	 * @return
+	 * @param offset offset in the answer array
+	 * @return determines if the name is compressed or not
 	 */
 	public boolean isCompression(int offset) {
 		return (dnsQueryAnswer[offset] & 0xC0) == 0xC0;
@@ -275,9 +310,9 @@ public class DnsQueryAnswer {
 	/**
 	 * Merges two bytes into an integer
 	 *
-	 * @param b1
-	 * @param b2
-	 * @return
+	 * @param b1 more significant byte
+	 * @param b2 less significant byte
+	 * @return the two bytes conjoined as an integer
 	 */
 	public int getInt(byte b1, byte b2) {
 		return b1 << 8 & 0xFF00 | b2 & 0xFF;
