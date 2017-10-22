@@ -7,6 +7,7 @@ public class DnsQueryAnswer {
 	private byte[] dnsQueryAnswer;
 	private int dnsQueryQuestionLength;
 	private int dnsAnswerPointer;
+	private int dnsRdLength;
 
 	// Actual data extracted from the answer, to be sent to stdout
 	private short dnsAnswerType;
@@ -34,12 +35,17 @@ public class DnsQueryAnswer {
 		// TODO: loop the following based on ANCOUNT
 
 		queryAnswerValidity();
+		queryAnswerQuestionFields();
 		queryAnswerName();
 		queryAnswerType();
 		queryAnswerClass();
 		queryTtl();
 		queryRdLength();
 		queryRData();
+
+	}
+
+	public void queryAnswerQuestionFields() {
 
 	}
 
@@ -67,13 +73,13 @@ public class DnsQueryAnswer {
 
 		switch (dnsAnswerType) {
 			case 0x0001:
-				dnsAnswerIP = queryNameServer(dnsAnswerPointer);
+				dnsAnswerIP = queryIpAddress(dnsAnswerPointer, dnsRdLength);
 				break;
 			case 0x0002:
 				dnsAnswerNameServer = queryNameServer(dnsAnswerPointer);
 				break;
 			case 0x0005:
-				dnsAnswerCanonicalName = queryNameServer(dnsAnswerPointer);
+				dnsAnswerCanonicalName = queryCanonicalName(dnsAnswerPointer);
 				break;
 			case 0x000f:
 				dnsMailServerPreference = queryMailServerPreference(dnsAnswerPointer);
@@ -176,6 +182,77 @@ public class DnsQueryAnswer {
 	}
 
 	/**
+	 * Checks the AA field in Answers packet Question fields.
+	 * If set to 1, name server is authoritative
+	 *
+	 * @param offset
+	 * @return
+	 */
+	public boolean queryIfNameServerAuthoritative(int offset) {
+		boolean authoritative = false;
+		return authoritative;
+	}
+
+	/**
+	 * Checks the TC field in Answers packet Question fields.
+	 * If set to 1, message was truncated
+	 *
+	 * @param offset
+	 * @return
+	 */
+	public boolean queryIfMessageWasTruncated(int offset) {
+		boolean truncated = false;
+		return truncated;
+	}
+
+	/**
+	 * Checks the RA field in Answers packet Question fields.
+	 * If set to 1, server supports recursion.
+	 * If 0, need to indicate error.
+	 *
+	 * @param offset
+	 * @return
+	 */
+	public boolean queryIfServerSupportsRecursion(int offset) {
+		boolean recursionSupported = false;
+		return recursionSupported;
+	}
+
+	/**
+	 * Checks RCODE field in Answers packet Question fields
+	 * If field is 0, no error, else any of 5 specified error types must be handled
+	 *
+	 * @param offset
+	 */
+	public void queryIfErrorsExist(int offset) {
+
+	}
+
+	/**
+	 * Checks ANCOUNT field in Answers packet Question fields
+	 * Indicates the number of resource records found in answer section
+	 *
+	 * @param offset
+	 * @return
+	 */
+	public int queryAnswerSectionRecordsCount(int offset) {
+		int numberOfRRs = 0;
+		return numberOfRRs;
+	}
+
+	/**
+	 * Checks ARCOUNT field in Answers packet Question fields
+	 * Indicates the number of resource records found in additional section
+	 *
+	 * @param offset
+	 * @return
+	 */
+	public int queryAdditionalSectionRecordsCount(int offset) {
+		int numberOfRRs = 0;
+		return numberOfRRs;
+	}
+
+	/**
 	 * Verifies if the label is a pointer (compression purposes)
 	 *
 	 * @param offset
@@ -201,12 +278,10 @@ public class DnsQueryAnswer {
 	 * question and answer IDs
 	 */
 	public void queryAnswerValidity() {
-		int dnsQuestionID = getInt(dnsQueryQuestion[0], dnsQueryQuestion[1]);
-		int dnsAnswerID = getInt(dnsQueryAnswer[0], dnsQueryAnswer[1]);
-
-		if (dnsQuestionID != dnsAnswerID) {
+		if (getInt(dnsQueryQuestion[0], dnsQueryQuestion[1]) != getInt(dnsQueryAnswer[0], dnsQueryAnswer[1])) {
 			System.out.println("Error \t Invalid DNS answer packet received: request and answer IDs don't match.");
 			System.exit(69);
 		}
 	}
+
 }
