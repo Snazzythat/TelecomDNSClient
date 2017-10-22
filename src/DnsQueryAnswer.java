@@ -6,7 +6,14 @@ public class DnsQueryAnswer {
 	private byte[] dnsQueryAnswer;
 	private int dnsQueryQuestionLength;
 	private int dnsAnswerPointer;
+
+	// Actual data extracted from the answer, to be sent to stdout
 	private short dnsAnswerType;
+	private String dnsAnswerIP;
+	private String dnsAnswerNameServer;
+	private String dnsAnswerCanonicalName;
+	private int dnsMailServerPreference;
+	private String dnsMailServerExchange;
 
 	public DnsQueryAnswer(byte[] dnsQueryAnswer, int dnsQueryQuestionLength) {
 
@@ -51,23 +58,46 @@ public class DnsQueryAnswer {
 
 		switch (dnsAnswerType) {
 			case 0x0001:
+				dnsAnswerIP = queryNameServer(dnsAnswerPointer);
 				break;
 			case 0x0002:
+				dnsAnswerNameServer = queryNameServer(dnsAnswerPointer);
 				break;
 			case 0x0005:
+				dnsAnswerCanonicalName = queryNameServer(dnsAnswerPointer);
 				break;
 			case 0x000f:
+				dnsMailServerPreference = queryMailServerPreference(dnsAnswerPointer);
+				dnsMailServerExchange = queryMailServerExchange(dnsAnswerPointer);
 				break;
 		}
 	}
 
+	/**
+	 * Verifies if the label is a pointer (compression purposes)
+	 *
+	 * @param offset
+	 * @return
+	 */
 	public boolean isCompression(int offset) {
 		return (dnsQueryAnswer[offset] & 0xC0) == 0xC0;
 	}
 
 	/**
+	 * Merges two bytes into an integer
+	 *
+	 * @param b1
+	 * @param b2
+	 * @return
+	 */
+	public int getInt(byte b1, byte b2) {
+		return b1 << 8 & 0xFF00 | b2 & 0xFF;
+	}
+
+	/**
 	 * Begin name with "", then if an index is encountered during name parse,
 	 * pass the already built name recursively
+	 *
 	 * @param offset
 	 * @param qName
 	 * @return
@@ -83,8 +113,8 @@ public class DnsQueryAnswer {
 				name += ".";
 			}
 
-			if (isCompression(index)){
-				queryName(dnsQueryAnswer[index + 1],name);
+			if (isCompression(index)) {
+				queryName(dnsQueryAnswer[index + 1], name);
 			}
 
 			int length = dnsQueryAnswer[index];
@@ -102,7 +132,6 @@ public class DnsQueryAnswer {
 	}
 
 	/**
-	 *
 	 * @param offset
 	 * @param RdLength
 	 * @return
@@ -125,41 +154,35 @@ public class DnsQueryAnswer {
 	}
 
 	/**
-	 *
 	 * @param offset
 	 * @return
 	 */
-	public String queryNameServer(int offset)
-	{
+	public String queryNameServer(int offset) {
 		return queryName(offset, "");
 	}
 
 	/**
-	 *
 	 * @param offset
 	 * @return
 	 */
-	public String queryCanonicalName(int offset)
-	{
+	public String queryCanonicalName(int offset) {
 		return queryName(offset, "");
 	}
 
 	/**
-	 *
 	 * @param offset
 	 * @return
 	 */
-	public int queryMailServerPreference(int offset){
+	public int queryMailServerPreference(int offset) {
 
-		return dnsQueryAnswer[offset + 1];
+		return getInt(dnsQueryAnswer[offset], dnsQueryAnswer[offset + 1]);
 	}
 
 	/**
-	 *
 	 * @param offset
 	 * @return
 	 */
-	public String queryMailServerExchange(int offset){
+	public String queryMailServerExchange(int offset) {
 
 		return queryName(offset, "");
 	}

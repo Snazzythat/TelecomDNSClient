@@ -23,7 +23,7 @@ public class DnsClient {
 			try {
 				clientIntsance.parseArguments(args);
 			} catch (Exception e) {
-				System.out.println("Failed to parse the arguments. Exiting.");
+				System.out.println("ERROR \t Failed to parse the arguments. Exiting.");
 				System.exit(69);
 			}
 
@@ -85,18 +85,18 @@ public class DnsClient {
 					dnsServerIP = args[i].replace("@", "");
 					String[] splitIP = dnsServerIP.split("\\.");
 					if (splitIP.length != 4) {
-						System.out.print("Invalid IPv4 address format! Make sure its X.X.X.X");
+						System.out.print("ERROR \t Invalid IPv4 address format! Make sure its X.X.X.X");
 						System.exit(69);
 					}
 					for (String s : splitIP) {
 						int j = Integer.parseInt(s);
 						if ((j < 0) || (j > 255)) {
-							System.out.print("Invalid IPv4 address format! Every octet must be between 0-255");
+							System.out.print("ERROR \t Invalid IPv4 address format! Every octet must be between 0-255");
 							System.exit(69);
 						}
 					}
 					if (dnsServerIP.endsWith(".")) {
-						System.out.print("Invalid IPv4 address format! Can't end with '.'");
+						System.out.print("ERROR \t Invalid IPv4 address format! Can't end with '.'");
 						System.exit(69);
 					}
 					break;

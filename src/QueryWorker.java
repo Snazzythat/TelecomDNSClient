@@ -99,12 +99,12 @@ public class QueryWorker {
 							+ " out of "
 							+ Integer.toString(this.retryCount));
 					if (retryCounter == this.retryCount) {
-						System.out.println("Maximum amount of retries reached. Exiting...");
+						System.out.println("ERROR \t Maximum number of retries " + this.retryCount + " exceeded");
 						break;
 					}
 					retryCounter += 1;
 				} else {
-					System.out.println("Request timed out. Exiting...");
+					System.out.println("ERROR \t Request timed out.");
 					break;
 				}
 			}
@@ -113,9 +113,10 @@ public class QueryWorker {
 
 				long difference = endTime - startTime;
 				System.out.println("Response received after " + difference + " ms.");
-
-				//TODO: parse response
-				//TODO: print stuff as specified
+				System.out.println("Parsing the DNS response packet...");
+				DnsQueryAnswer answer = new DnsQueryAnswer(answerPacket.getData(), dnsRequest.length);
+				//Will loop over the answer byte array, parse out the necessary fields and print to stdout
+				answer.queryAnswer();
 				break;
 			}
 		}
