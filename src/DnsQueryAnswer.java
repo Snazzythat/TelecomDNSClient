@@ -6,6 +6,7 @@ public class DnsQueryAnswer {
 	private byte[] dnsQueryAnswer;
 	private int dnsQueryQuestionLength;
 	private int dnsAnswerPointer;
+	private short dnsAnswerType;
 
 	public DnsQueryAnswer(byte[] dnsQueryAnswer, int dnsQueryQuestionLength) {
 
@@ -48,6 +49,16 @@ public class DnsQueryAnswer {
 
 	public void queryRData() {
 
+		switch (dnsAnswerType) {
+			case 0x0001:
+				break;
+			case 0x0002:
+				break;
+			case 0x0005:
+				break;
+			case 0x000f:
+				break;
+		}
 	}
 
 	public boolean isCompression(int offset) {
