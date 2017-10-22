@@ -90,6 +90,12 @@ public class DnsQueryAnswer {
 		return name;
 	}
 
+	/**
+	 *
+	 * @param offset
+	 * @param RdLength
+	 * @return
+	 */
 	public String queryIpAddress(int offset, int RdLength) {
 
 		String ipAddress = "";
@@ -106,5 +112,46 @@ public class DnsQueryAnswer {
 
 		return ipAddress;
 	}
+
+	/**
+	 *
+	 * @param offset
+	 * @return
+	 */
+	public String queryNameServer(int offset)
+	{
+		return queryName(offset, "");
+	}
+
+	/**
+	 *
+	 * @param offset
+	 * @return
+	 */
+	public String queryCanonicalName(int offset)
+	{
+		return queryName(offset, "");
+	}
+
+	/**
+	 *
+	 * @param offset
+	 * @return
+	 */
+	public int queryMailServerPreference(int offset){
+
+		return dnsQueryAnswer[offset];
+	}
+
+	/**
+	 *
+	 * @param offset
+	 * @return
+	 */
+	public String queryMailServerExchange(int offset){
+
+		return queryName(offset, "");
+	}
+
 
 }
