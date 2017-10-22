@@ -58,7 +58,7 @@ public class DnsQueryAnswer {
 	 * Begin name with "", then if an index is encountered during name parse,
 	 * pass the already built name recursively
 	 * @param offset
-	 * @param qname
+	 * @param qName
 	 * @return
 	 */
 	public String queryName(int offset, String qName) {
