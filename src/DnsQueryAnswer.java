@@ -8,6 +8,11 @@ public class DnsQueryAnswer {
 	private int dnsQueryQuestionLength;
 	private int dnsAnswerPointer;
 	private int dnsRdLength;
+	private boolean dnsAnswerIsAuthorative = false;
+	private boolean dnsAnswerTruncated = false;
+	private int dnsAnswerRRCount;
+	private int dnsAdditionalRRCount;
+
 
 	// Actual data extracted from the answer, to be sent to stdout
 	private short dnsAnswerType;
@@ -30,11 +35,14 @@ public class DnsQueryAnswer {
 		this.dnsQueryQuestionLength = dnsQueryQuestion.length;
 	}
 
+	/**
+	 * Main looping parser function
+	 */
 	public void queryAnswer() {
 
 		// TODO: loop the following based on ANCOUNT
 		queryAnswerValidity();
-		queryAnswerQuestionFields();
+		queryAnswerHeaderFields();
 		queryAnswerName();
 		queryAnswerType();
 		queryAnswerClass();
@@ -44,8 +52,40 @@ public class DnsQueryAnswer {
 
 	}
 
-	public void queryAnswerQuestionFields() {
+	/**
+	 * Goes through answer header and gets static fields to print out
+	 */
+	public void queryAnswerHeaderFields() {
 
+		//AA and TC fields in header is located in byte 2
+		dnsAnswerIsAuthorative = queryIfNameServerAuthoritative(2);
+		dnsAnswerTruncated = queryIfMessageWasTruncated(2);
+
+		//RA field located in byte 3
+		queryIfServerSupportsRecursion(3);
+
+		//RCODE field located in byte 3, last 4 bits
+		switch (queryErrorCode(3)) {
+			case 1:
+				System.out.println("ERROR \t Format error: the name server was unable to interpret the query.");
+				break;
+			case 2:
+				System.out.println("ERROR \t  Server failure: the name server was unable to process this query " +
+						"due to a problem with the name server");
+				break;
+			case 3:
+				System.out.println("NOTFOUND \t Name error: the domain name specified in the query not found.");
+				break;
+			case 4:
+				System.out.println("ERROR \t Not implemented: the name server does not support the requested kind of query.");
+				break;
+			case 5:
+				System.out.println("ERROR \t Refused: the name server refuses to perform the requested operation for policy reasons");
+				break;
+		}
+
+		dnsAnswerRRCount = queryAnswerSectionRecordsCount(6);
+		dnsAdditionalRRCount = queryAdditionalSectionRecordsCount(10);
 	}
 
 	public void queryAnswerName() {
@@ -226,6 +266,8 @@ public class DnsQueryAnswer {
 
 		if (((dnsQueryAnswer[offset] >> 7) & 1) == 1) {
 			recursionSupported = true;
+		} else {
+			System.out.println("ERROR \t The server does not support recursive requests");
 		}
 		return recursionSupported;
 	}
@@ -289,7 +331,7 @@ public class DnsQueryAnswer {
 	 */
 	public void queryAnswerValidity() {
 		if (getInt(dnsQueryQuestion[0], dnsQueryQuestion[1]) != getInt(dnsQueryAnswer[0], dnsQueryAnswer[1])) {
-			System.out.println("Error \t Invalid DNS answer packet received: request and answer IDs don't match.");
+			System.out.println("ERROR \t Invalid DNS answer packet received: request and answer IDs don't match.");
 			System.exit(69);
 		}
 	}
