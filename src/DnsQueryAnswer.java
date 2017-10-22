@@ -61,14 +61,14 @@ public class DnsQueryAnswer {
 	 * @param qname
 	 * @return
 	 */
-	public String queryName(int offset, String qname) {
+	public String queryName(int offset, String qName) {
 
-		String name = qname;
+		String name = qName;
 		int index = offset;
 
 		while (dnsQueryAnswer[index] != 0) {
 
-			if (!name.equals("") && name.charAt(name.length() - 1) != '.') {
+			if (!name.equals("") || name.charAt(name.length() - 1) != '.') {
 				name += ".";
 			}
 
