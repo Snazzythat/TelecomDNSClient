@@ -66,6 +66,9 @@ public class QueryWorker {
 		if (this.timeout != 0) {
 			udpSock.setSoTimeout(this.timeout);
 		}
+		else{
+			udpSock.setSoTimeout(5000);
+		}
 
 		int retryCounter = 1;
 

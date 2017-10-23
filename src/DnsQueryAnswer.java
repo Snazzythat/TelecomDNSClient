@@ -324,7 +324,7 @@ public class DnsQueryAnswer {
 		if (((dnsQueryAnswer[offset] >> 7) & 1) == 1) {
 			recursionSupported = true;
 		} else {
-			System.out.println("ERROR \t The server does not support recursive requests");
+			System.out.println("ERROR \t Server error: The server does not support recursive requests");
 		}
 		return recursionSupported;
 	}
@@ -388,7 +388,7 @@ public class DnsQueryAnswer {
 	 */
 	public void queryAnswerValidity() {
 		if (getInt(dnsQueryQuestion[0], dnsQueryQuestion[1]) != getInt(dnsQueryAnswer[0], dnsQueryAnswer[1])) {
-			System.out.println("ERROR \t Invalid DNS answer packet received: request and answer IDs don't match.");
+			System.out.println("ERROR \t Unexpected response: Invalid DNS answer packet received: request and answer IDs don't match.");
 			System.exit(69);
 		}
 	}
@@ -398,7 +398,7 @@ public class DnsQueryAnswer {
 	 */
 	public void outputResultsToConsole(int anCount) {
 		if (anCount == dnsAnswerRRCount) {
-			System.out.println("***Answer Section (" + dnsAnswerRRCount + " records)***");
+			System.out.println("\n***Answer Section (" + dnsAnswerRRCount + " records)***");
 		}
 		String aut = "noauth";
 		if (dnsAnswerIsAuthoritative) {
@@ -411,6 +411,10 @@ public class DnsQueryAnswer {
 
 			case 0x0002:
 				System.out.println("NS \t " + dnsAnswerNameServer + "\t" + dnsAnswerTtl + "\t" + aut);
+				break;
+
+			case 0x0005:
+				System.out.println("CNAME \t " + dnsAnswerCanonicalName + "\t" + dnsAnswerTtl + "\t" + aut);
 				break;
 
 			case 0x000f:
