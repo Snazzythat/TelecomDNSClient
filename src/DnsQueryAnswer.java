@@ -63,10 +63,11 @@ public class DnsQueryAnswer {
 	 */
 	public void queryAnswer() {
 
-		// TODO: loop the following based on ANCOUNT
+		// Preliminary and static check
 		queryAnswerValidity();
 		queryAnswerHeaderFields();
 
+		// Check all answer records
 		for (int anCount = queryAnswerSectionRecordsCount(6); anCount > 0; anCount--) {
 			queryAnswerName();
 			queryAnswerType();
@@ -74,9 +75,21 @@ public class DnsQueryAnswer {
 			queryTtl();
 			queryRdLength();
 			queryRData();
-			outputResultsToConsole(anCount);
+			outputResultsToConsole(anCount,"answer");
 		}
 
+		// Check all additional records, if any exist
+		if (dnsAdditionalRRCount > 0){
+			for (int adCount = dnsAdditionalRRCount; adCount > 0; adCount --){
+				queryAnswerName();
+				queryAnswerType();
+				queryAnswerClass();
+				queryTtl();
+				queryRdLength();
+				queryRData();
+				outputResultsToConsole(adCount,"additional");
+			}
+		}
 	}
 
 	/**
@@ -396,10 +409,15 @@ public class DnsQueryAnswer {
 	/**
 	 * Print results to STDOUT
 	 */
-	public void outputResultsToConsole(int anCount) {
-		if (anCount == dnsAnswerRRCount) {
+	public void outputResultsToConsole(int anCount, String field) {
+		if (anCount == dnsAnswerRRCount && field == "answer") {
 			System.out.println("\n***Answer Section (" + dnsAnswerRRCount + " records)***");
 		}
+
+		if (anCount == dnsAdditionalRRCount && field == "additional") {
+			System.out.println("\n***Additional Section (" + dnsAdditionalRRCount + " records)***");
+		}
+
 		String aut = "noauth";
 		if (dnsAnswerIsAuthoritative) {
 			aut = "auth";
@@ -423,5 +441,4 @@ public class DnsQueryAnswer {
 		}
 		resetParameters();
 	}
-
 }
