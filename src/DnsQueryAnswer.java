@@ -7,8 +7,8 @@ public class DnsQueryAnswer {
 	private byte[] dnsQueryAnswer;
 	private int dnsAnswerPointer;
 	private short dnsRdLength;
-	private boolean dnsAnswerIsAuthorative = false;
-	private boolean dnsAnswerTruncated = false;
+	private boolean dnsAnswerIsAuthorative;
+	private boolean dnsAnswerTruncated;
 	private int dnsAnswerRRCount;
 	private int dnsAdditionalRRCount;
 
@@ -16,12 +16,12 @@ public class DnsQueryAnswer {
 	private short dnsAnswerType;
 	private short dnsAnswerClass;
 	private int dnsAnswerTtl;
-	private String dnsAnswerName = "";
-	private String dnsAnswerIP = "";
-	private String dnsAnswerNameServer = "";
-	private String dnsAnswerCanonicalName = "";
+	private String dnsAnswerName;
+	private String dnsAnswerIP;
+	private String dnsAnswerNameServer;
+	private String dnsAnswerCanonicalName;
 	private int dnsMailServerPreference;
-	private String dnsMailServerExchange = "";
+	private String dnsMailServerExchange;
 
 	/**
 	 * Constructor
@@ -34,6 +34,34 @@ public class DnsQueryAnswer {
 		this.dnsQueryQuestion = dnsQueryQuestion;
 		this.dnsQueryAnswer = dnsQueryAnswer;
 		this.dnsAnswerPointer = dnsQueryQuestion.length;
+
+		resetParameters();
+	}
+
+	/**
+	 * Reset/initialize all parameters
+	 */
+	public void resetParameters() {
+
+		// boolean parameters
+		dnsAnswerIsAuthorative = false;
+		dnsAnswerTruncated = false;
+
+		// integer/short parameters
+		dnsRdLength = 0;
+		dnsAnswerRRCount = 0;
+		dnsAdditionalRRCount = 0;
+		dnsAnswerType = 0;
+		dnsAnswerClass = 0;
+		dnsAnswerTtl = 0;
+		dnsMailServerPreference = 0;
+
+		// string parameters
+		dnsAnswerName = "";
+		dnsAnswerIP = "";
+		dnsAnswerNameServer = "";
+		dnsAnswerCanonicalName = "";
+		dnsMailServerExchange= "";
 	}
 
 	/**
