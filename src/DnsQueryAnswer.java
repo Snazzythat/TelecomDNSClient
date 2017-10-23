@@ -16,12 +16,12 @@ public class DnsQueryAnswer {
 	private short dnsAnswerType;
 	private short dnsAnswerClass;
 	private int dnsAnswerTtl;
-	private String dnsAnswerName;
-	private String dnsAnswerIP;
-	private String dnsAnswerNameServer;
-	private String dnsAnswerCanonicalName;
+	private String dnsAnswerName = "";
+	private String dnsAnswerIP = "";
+	private String dnsAnswerNameServer = "";
+	private String dnsAnswerCanonicalName = "";
 	private int dnsMailServerPreference;
-	private String dnsMailServerExchange;
+	private String dnsMailServerExchange = "";
 
 	/**
 	 * Constructor
@@ -176,7 +176,7 @@ public class DnsQueryAnswer {
 
 		while (dnsQueryAnswer[index] != 0) {
 
-			if (!name.equals("") || name.charAt(name.length() - 1) != '.') {
+			if (!name.equals("") || (name.length() > 0 && name.charAt(name.length() - 1) != '.')) {
 				name += ".";
 			}
 
