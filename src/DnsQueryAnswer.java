@@ -7,7 +7,7 @@ public class DnsQueryAnswer {
 	private byte[] dnsQueryAnswer;
 	private int dnsAnswerPointer;
 	private short dnsRdLength;
-	private boolean dnsAnswerIsAuthorative;
+	private boolean dnsAnswerIsAuthoritative;
 	private boolean dnsAnswerTruncated;
 	private int dnsAnswerRRCount;
 	private int dnsAdditionalRRCount;
@@ -43,14 +43,8 @@ public class DnsQueryAnswer {
 	 */
 	public void resetParameters() {
 
-		// boolean parameters
-		//dnsAnswerIsAuthorative = false;
-		//dnsAnswerTruncated = false;
-
 		// integer/short parameters
 		dnsRdLength = 0;
-		//dnsAnswerRRCount = 0;
-		//dnsAdditionalRRCount = 0;
 		dnsAnswerType = 0;
 		dnsAnswerClass = 0;
 		dnsAnswerTtl = 0;
@@ -61,7 +55,7 @@ public class DnsQueryAnswer {
 		dnsAnswerIP = "";
 		dnsAnswerNameServer = "";
 		dnsAnswerCanonicalName = "";
-		dnsMailServerExchange= "";
+		dnsMailServerExchange = "";
 	}
 
 	/**
@@ -91,7 +85,7 @@ public class DnsQueryAnswer {
 	public void queryAnswerHeaderFields() {
 
 		//AA and TC fields in header is located in byte 2
-		dnsAnswerIsAuthorative = queryIfNameServerAuthoritative(2);
+		dnsAnswerIsAuthoritative = queryIfNameServerAuthoritative(2);
 		dnsAnswerTruncated = queryIfMessageWasTruncated(2);
 
 		//RA field located in byte 3
@@ -400,17 +394,17 @@ public class DnsQueryAnswer {
 	}
 
 	/**
-	 *	Print results to STDOUT
+	 * Print results to STDOUT
 	 */
-	public void outputResultsToConsole(int anCount){
-		if (anCount == dnsAnswerRRCount){
+	public void outputResultsToConsole(int anCount) {
+		if (anCount == dnsAnswerRRCount) {
 			System.out.println("***Answer Section (" + dnsAnswerRRCount + " records)***");
 		}
 		String aut = "noauth";
-		if (dnsAnswerIsAuthorative){
+		if (dnsAnswerIsAuthoritative) {
 			aut = "auth";
 		}
-		switch(dnsAnswerType){
+		switch (dnsAnswerType) {
 			case 0x0001:
 				System.out.println("IP \t " + dnsAnswerIP + "\t" + dnsAnswerTtl + "\t" + aut);
 				break;
