@@ -94,11 +94,11 @@ public class DnsQueryAnswer {
 
 	public void queryAnswerName() {
 
-		queryName(dnsAnswerPointer, dnsAnswerName);
+		dnsAnswerName = queryName(dnsAnswerPointer, "");
 
 		while (dnsQueryAnswer[dnsAnswerPointer] != 0) {
 
-			if (isCompression(dnsQueryAnswer[dnsAnswerPointer])) {
+			if (isCompression(dnsAnswerPointer)) {
 				dnsAnswerPointer += 2;
 				break;
 			}
@@ -158,7 +158,7 @@ public class DnsQueryAnswer {
 				break;
 		}
 
-		dnsAnswerPointer += dnsRdLength + 1;
+		dnsAnswerPointer += dnsRdLength;
 	}
 
 	/**
@@ -171,23 +171,23 @@ public class DnsQueryAnswer {
 	 */
 	public String queryName(int offset, String qName) {
 
-		String name = qName;
 		int index = offset;
 
 		while (dnsQueryAnswer[index] != 0) {
 
-			if (!name.equals("") || (name.length() > 0 && name.charAt(name.length() - 1) != '.')) {
-				name += ".";
+			if (!qName.equals("") && qName.length() > 0 && qName.charAt(qName.length() - 1) != '.') {
+				qName += ".";
 			}
 
 			if (isCompression(index)) {
-				queryName(dnsQueryAnswer[index + 1], name);
+				qName = queryName(dnsQueryAnswer[index + 1], qName);
+				break;
 			}
 
 			int length = dnsQueryAnswer[index];
-			ByteBuffer buffer = ByteBuffer.allocate(length).put(dnsQueryAnswer, index + 1, index + length - 1);
+			ByteBuffer buffer = ByteBuffer.allocate(length).put(dnsQueryAnswer, index + 1, length);
 			try {
-				name += new String(buffer.array(), "UTF-8");
+				qName += new String(buffer.array(), "UTF-8");
 			} catch (UnsupportedEncodingException e) {
 				e.printStackTrace();
 			}
@@ -195,7 +195,7 @@ public class DnsQueryAnswer {
 			index += length + 1;
 		}
 
-		return name;
+		return qName;
 	}
 
 	/**
