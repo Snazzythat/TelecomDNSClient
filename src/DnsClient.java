@@ -72,11 +72,9 @@ public class DnsClient {
 							break;
 						case 'n':
 							queryType = "NS";
-							i++;
 							break;
 						case 'm':
 							queryType = "MX";
-							i++;
 							break;
 					}
 
