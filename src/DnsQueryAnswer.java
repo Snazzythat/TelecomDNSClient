@@ -154,7 +154,7 @@ public class DnsQueryAnswer {
 				break;
 			case 0x000f:
 				dnsMailServerPreference = queryMailServerPreference(dnsAnswerPointer);
-				dnsMailServerExchange = queryMailServerExchange(dnsAnswerPointer);
+				dnsMailServerExchange = queryMailServerExchange(dnsAnswerPointer + 2);
 				break;
 		}
 
