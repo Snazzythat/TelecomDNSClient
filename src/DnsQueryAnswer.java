@@ -44,13 +44,13 @@ public class DnsQueryAnswer {
 	public void resetParameters() {
 
 		// boolean parameters
-		dnsAnswerIsAuthorative = false;
-		dnsAnswerTruncated = false;
+		//dnsAnswerIsAuthorative = false;
+		//dnsAnswerTruncated = false;
 
 		// integer/short parameters
 		dnsRdLength = 0;
-		dnsAnswerRRCount = 0;
-		dnsAdditionalRRCount = 0;
+		//dnsAnswerRRCount = 0;
+		//dnsAdditionalRRCount = 0;
 		dnsAnswerType = 0;
 		dnsAnswerClass = 0;
 		dnsAnswerTtl = 0;
@@ -80,6 +80,7 @@ public class DnsQueryAnswer {
 			queryTtl();
 			queryRdLength();
 			queryRData();
+			outputResultsToConsole(anCount);
 		}
 
 	}
@@ -396,6 +397,33 @@ public class DnsQueryAnswer {
 			System.out.println("ERROR \t Invalid DNS answer packet received: request and answer IDs don't match.");
 			System.exit(69);
 		}
+	}
+
+	/**
+	 *	Print results to STDOUT
+	 */
+	public void outputResultsToConsole(int anCount){
+		if (anCount == dnsAnswerRRCount){
+			System.out.println("***Answer Section (" + dnsAnswerRRCount + " records)***");
+		}
+		String aut = "noauth";
+		if (dnsAnswerIsAuthorative){
+			aut = "auth";
+		}
+		switch(dnsAnswerType){
+			case 0x0001:
+				System.out.println("IP \t " + dnsAnswerIP + "\t" + dnsAnswerTtl + "\t" + aut);
+				break;
+
+			case 0x0002:
+				System.out.println("NS \t " + dnsAnswerNameServer + "\t" + dnsAnswerTtl + "\t" + aut);
+				break;
+
+			case 0x000f:
+				System.out.println("MX \t " + dnsMailServerExchange + "\t" + dnsMailServerPreference + "\t" + dnsAnswerTtl + "\t" + aut);
+				break;
+		}
+		resetParameters();
 	}
 
 }
