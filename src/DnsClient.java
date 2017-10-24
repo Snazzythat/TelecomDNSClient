@@ -54,20 +54,35 @@ public class DnsClient {
 					switch (args[i].charAt(1)) {
 						case 't':
 							if (!args[i + 1].isEmpty()) {
-								timeout = Integer.parseInt(args[i + 1]);
-								i++;
+								try {
+									timeout = Integer.parseInt(args[i + 1]);
+									i++;
+								} catch (Exception e) {
+									System.out.print("ERROR \t Format error: timeout needs to be of type integer.");
+									System.exit(69);
+								}
 							}
 							break;
 						case 'r':
 							if (!args[i + 1].isEmpty()) {
-								retryCount = Integer.parseInt(args[i + 1]);
-								i++;
+								try {
+									retryCount = Integer.parseInt(args[i + 1]);
+									i++;
+								} catch (Exception e) {
+									System.out.print("ERROR \t Format error: number of retries needs to be of type integer.");
+									System.exit(69);
+								}
 							}
 							break;
 						case 'p':
 							if (!args[i + 1].isEmpty()) {
-								port = Integer.parseInt(args[i + 1]);
-								i++;
+								try {
+									port = Integer.parseInt(args[i + 1]);
+									i++;
+								} catch (Exception e) {
+									System.out.print("ERROR \t Format error: port needs to be of type integer.");
+									System.exit(69);
+								}
 							}
 							break;
 						case 'n':
@@ -113,7 +128,7 @@ public class DnsClient {
 		System.out.println("\n\n");
 		System.out.println("DnsClient sending request for " + domainName);
 		System.out.println("Server: " + dnsServerIP);
-		System.out.println("Port: " +  port);
+		System.out.println("Port: " + port);
 		System.out.println("Request type: " + queryType);
 
 		QueryWorker worker = new QueryWorker(dnsServerIP, domainName, timeout, retryCount, port, queryType);
