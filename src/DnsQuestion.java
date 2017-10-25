@@ -35,7 +35,6 @@ public class DnsQuestion {
 	}
 
 	private byte[] constructQName(String domainName) {
-
 		String[] domainNameArray = domainName.split("\\.");
 
 		// determine length of array so we can construct it

@@ -30,7 +30,7 @@ public class DnsClient {
 			clientIntsance.startQuery();
 
 		} else {
-			System.out.println("No arguments were passed. See usage:\n");
+			System.out.println("Arguments are missing See usage:\n");
 			System.out.println("@server | (req) - IPv4 address of the DNSserver");
 			System.out.println("name | (req) - Domain name to query.");
 			System.out.println("-t timeout | (opt) - Timeout before query retransmission");
@@ -58,7 +58,7 @@ public class DnsClient {
 									timeout = Integer.parseInt(args[i + 1]);
 									i++;
 								} catch (Exception e) {
-									System.out.print("ERROR \t Format error: timeout needs to be of type integer.");
+									System.out.print("ERROR \t Format error: timeout needs to be of type integer.\n");
 									System.exit(69);
 								}
 							}
@@ -69,7 +69,7 @@ public class DnsClient {
 									retryCount = Integer.parseInt(args[i + 1]);
 									i++;
 								} catch (Exception e) {
-									System.out.print("ERROR \t Format error: number of retries needs to be of type integer.");
+									System.out.print("ERROR \t Format error: number of retries needs to be of type integer.\n");
 									System.exit(69);
 								}
 							}
@@ -80,7 +80,7 @@ public class DnsClient {
 									port = Integer.parseInt(args[i + 1]);
 									i++;
 								} catch (Exception e) {
-									System.out.print("ERROR \t Format error: port needs to be of type integer.");
+									System.out.print("ERROR \t Format error: port needs to be of type integer.\n");
 									System.exit(69);
 								}
 							}
@@ -98,18 +98,18 @@ public class DnsClient {
 					dnsServerIP = args[i].replace("@", "");
 					String[] splitIP = dnsServerIP.split("\\.");
 					if (splitIP.length != 4) {
-						System.out.print("ERROR \t Format error: Invalid IPv4 address format! Make sure its X.X.X.X");
+						System.out.print("ERROR \t Format error: Invalid IPv4 address format! Make sure its X.X.X.X\n");
 						System.exit(69);
 					}
 					for (String s : splitIP) {
 						int j = Integer.parseInt(s);
 						if ((j < 0) || (j > 255)) {
-							System.out.print("ERROR \t Format error: Invalid IPv4 address format! Every octet must be between 0-255");
+							System.out.print("ERROR \t Format error: Invalid IPv4 address format! Every octet must be between 0-255\n");
 							System.exit(69);
 						}
 					}
 					if (dnsServerIP.endsWith(".")) {
-						System.out.print("ERROR \t Format error: Invalid IPv4 address format! Can't end with '.'");
+						System.out.print("ERROR \t Format error: Invalid IPv4 address format! Can't end with '.'\n");
 						System.exit(69);
 					}
 					break;
